@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My Plans</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7f9;--dot:#c3c8d1;--card:#fff;--ink:#1b1f29;--mute:#6b7280;--line:#e3e6ec;--blue:#2457e6;--red:#e5534b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161b;--dot:#333946;--card:#1d2027;--ink:#eceef3;--mute:#9aa1ae;--line:#2d323c;--blue:#6b93ff}}
+:root[data-theme="dark"]{--bg:#14161b;--dot:#333946;--card:#1d2027;--ink:#eceef3;--mute:#9aa1ae;--line:#2d323c;--blue:#6b93ff}
+*{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:15px/1.5 "Noto Sans Thai","Noto Sans",system-ui,sans-serif;overflow:hidden}
+.top,.tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:8px 10px;background:var(--card);border-bottom:1px solid var(--line)}
+.top .stat{color:var(--mute);font-size:12px;margin-left:auto}
+.zoom{display:flex;gap:2px}
+.tabs{overflow-x:auto;flex-wrap:nowrap;padding:6px 10px}
+.tab{border-radius:8px 8px 0 0;white-space:nowrap}
+.tab.on{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600;width:130px}
+.stage{position:relative;flex:1;min-height:0}
+#vp{position:absolute;inset:0;overflow:hidden;touch-action:none;background-color:var(--bg);cursor:grab}
+#world{position:absolute;left:0;top:0;transform-origin:0 0}
+.card{position:absolute;display:flex;flex-direction:column;background:var(--card);border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.16);overflow:hidden;cursor:default}
+.card.drag{box-shadow:0 14px 40px rgba(0,0,0,.3);z-index:5}
+.card.min{height:auto!important}
+.bar{flex:none;display:flex;align-items:center;gap:8px;padding:9px 12px;background:color-mix(in srgb,var(--c) 14%,var(--card));border-bottom:1px solid var(--line);cursor:grab;touch-action:none;user-select:none}
+.card.drag .bar{cursor:grabbing}
+.bt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:var(--mute);margin-left:4px}
+.tl{width:15px;height:15px;border-radius:50%;border:0;padding:0;flex:none;font-size:11px;line-height:15px;text-align:center;color:transparent}
+.tl:hover{color:rgba(0,0,0,.6)}
+.tl.r{background:#ff5f57}.tl.y{background:#febc2e}.tl.g{background:#28c840}
+.tl.armed{outline:2px solid var(--red);outline-offset:2px}
+.card.min .cb,.card.min .rz{display:none}
+.cb{flex:1;min-height:0;overflow:auto;padding:12px}
+.rz{position:absolute;right:0;bottom:0;width:22px;height:22px;cursor:nwse-resize;touch-action:none;background:linear-gradient(135deg,transparent 55%,var(--mute) 55%,var(--mute) 62%,transparent 62%,transparent 74%,var(--mute) 74%,var(--mute) 81%,transparent 81%);opacity:.7}
+.big{border-left:4px solid var(--c);background:color-mix(in srgb,var(--c) 18%,var(--card));border-radius:0 8px 8px 0;padding:8px 10px;margin-bottom:10px}
+.big input.title{width:100%;border:0;background:transparent;font:700 17px "Noto Sans Thai","Noto Sans",sans-serif;padding:0;outline:0}
+.big small{color:var(--mute);font-size:12px;display:block}
+.cols{display:flex;gap:6px;align-items:center;margin-top:6px}
+.sw{width:18px;height:18px;border-radius:50%;border:2px solid var(--card);padding:0;box-shadow:0 0 0 1px var(--line)}
+.rb{position:relative;width:18px;height:18px;border-radius:50%;overflow:hidden;background:conic-gradient(#f33,#fc3,#3d5,#3cf,#63f,#f3c,#f33);box-shadow:0 0 0 1px var(--line);cursor:pointer}
+.rb input{position:absolute;inset:-8px;width:200%;height:200%;opacity:0;cursor:pointer;padding:0;border:0}
+.sub{padding:8px 0;border-bottom:1px solid var(--line)}
+.r1{display:flex;gap:6px;align-items:center}
+.r1 input[type=checkbox]{width:20px;height:20px;accent-color:var(--blue);flex:none;padding:0}
+.r1 .what{flex:1}
+.sub.done .what{text-decoration:line-through;color:var(--mute)}
+.dur{display:flex;align-items:center;gap:3px;color:var(--mute);font-size:12px;flex:none}
+.dur input{width:44px;text-align:center;padding:6px 2px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0 0 26px}
+input,textarea{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 8px;min-width:0}
+input.what,.r2 textarea{width:100%}
+textarea{resize:vertical;min-height:36px;height:36px;font-size:13px}
+input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:5px 10px}
+.x{padding:4px 6px;color:var(--mute);border:0;background:transparent}
+.x:hover,.x.armed{color:var(--red)}
+.add{border-style:dashed;color:var(--blue);margin-top:8px}
+.primary{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
+.foot{margin:8px 0 14px;color:var(--mute);font-size:13px}
+.panel{display:none;position:absolute;top:8px;right:8px;z-index:20;width:min(320px,calc(100% - 16px));background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.2);padding:12px;max-height:80%;overflow:auto;cursor:default}
+.panel p{margin:0 0 8px;font-size:13px;color:var(--mute)}
+.lg{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.lg i{width:18px;height:18px;border-radius:50%;flex:none}
+.lg input{flex:1}
+#bkText{width:100%;height:100px;font:12px monospace}
+.empty{position:absolute;left:0;right:0;top:35%;text-align:center;color:var(--mute);pointer-events:none;padding:0 16px}
+</style>
+</head>
+<body>
+<div class="top">
+  <button class="primary" id="addTask">+ Big task</button>
+  <button id="lgBtn">Color labels</button>
+  <button id="dotBtn">Hide dots</button>
+  <button id="bkBtn">Backup</button>
+  <span class="zoom"><button id="zo" aria-label="Zoom out">−</button><button id="zv" title="Reset zoom">100%</button><button id="zi" aria-label="Zoom in">+</button></span>
+  <button id="fit">Fit all</button>
+  <span class="stat" id="stat"></span>
+</div>
+<div class="tabs" id="tabs"></div>
+<div class="stage">
+  <div id="vp"><div id="world"></div><div class="empty" id="empty">Infinite canvas · tap “+ Big task” to start<br>Drag empty space to pan · pinch or Ctrl+scroll to zoom</div></div>
+  <div class="panel" id="lgP"><p>Name what each color means (shared across all pages).</p><div id="lgList"></div><button class="primary" id="tidy">Group this page by color</button></div>
+  <div class="panel" id="bkP"><p>Copy this text as a backup, or paste an old backup and tap Import (replaces all pages).</p><textarea id="bkText" spellcheck="false"></textarea><div style="display:flex;gap:8px;margin-top:6px;align-items:center"><button id="bkCopy">Copy</button><button id="bkImport">Import</button><span id="bkMsg" style="font-size:13px;color:var(--mute)"></span></div></div>
+</div>
+<script>
+const KEY="task-planner-v3",PAL=["#2457e6","#f2c230"];
+const uid=()=>Math.random().toString(36).slice(2,9);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const newSub=()=>({id:uid(),done:false,what:"",h:"",m:"",how:"",why:""});
+const vw0=()=>window.innerWidth<520?.75:1;
+const newPage=n=>({id:uid(),name:n,tasks:[],view:{x:30,y:30,z:vw0()}});
+function fixTask(t,i){const o=Object.assign({id:uid(),title:"",x:20+(i%2)*460,y:20+Math.floor(i/2)*340,color:PAL[0],w:440,h:null,min:false,subs:[]},t);if(o.big&&o.w===440)o.w=720;delete o.big;return o}
+function mig(d){
+  if(Array.isArray(d)){const p=newPage("Page 1");p.tasks=d.map(fixTask);d={pages:[p],cur:p.id,cats:{}}}
+  if(!d||!Array.isArray(d.pages)||!d.pages.length)throw 0;
+  d.cats=d.cats||{};d.dots=d.dots!==false;
+  d.pages.forEach(p=>{p.name=String(p.name).replace(/^หน้า (\d+)$/,"Page $1");p.view=p.view||{x:30,y:30,z:1};p.tasks=(p.tasks||[]).map(fixTask)});
+  if(!d.pages.some(p=>p.id===d.cur))d.cur=d.pages[0].id;return d;
+}
+let D;
+try{const s=localStorage.getItem(KEY)||localStorage.getItem("task-planner-v2");D=mig(JSON.parse(s))}catch(e){const p=newPage("Page 1");D={pages:[p],cur:p.id,cats:{},dots:true}}
+let st;const save=()=>{clearTimeout(st);st=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}},250)};
+const P=()=>D.pages.find(p=>p.id===D.cur),V=()=>P().view,T=id=>P().tasks.find(t=>t.id===id);
+const $=id=>document.getElementById(id),vp=$("vp"),world=$("world");
+const cat=c=>D.cats[c]||"Big task",pl=(n,w)=>n+" "+w+(n===1?"":"s");
+const DEF="Untitled",q=t=>world.querySelector('[data-t="'+t.id+'"]');
+function total(t){const n=t.subs.reduce((a,s)=>a+(+s.h||0)*60+(+s.m||0),0),h=Math.floor(n/60),m=n%60;return (h?h+" hr ":"")+(m||!h?m+" min":"")}
+const sum=t=>"Done "+t.subs.filter(s=>s.done).length+"/"+t.subs.length+" · Total "+total(t);
+function apply(){
+  const v=V(),g=22*v.z,r=Math.max(1,1.4*v.z);
+  world.style.transform=`translate(${v.x}px,${v.y}px) scale(${v.z})`;
+  vp.style.backgroundImage=D.dots?`radial-gradient(var(--dot) ${r}px,transparent ${r}px)`:"none";
+  vp.style.backgroundSize=g+"px "+g+"px";vp.style.backgroundPosition=v.x+"px "+v.y+"px";
+  $("zv").textContent=Math.round(v.z*100)+"%";$("dotBtn").textContent=D.dots?"Hide dots":"Show dots";save();
+}
+function zoomAt(cx,cy,f){const v=V(),z=Math.min(2,Math.max(.25,v.z*f)),k=z/v.z;v.x=cx-(cx-v.x)*k;v.y=cy-(cy-v.y)*k;v.z=z;apply()}
+const mid=()=>({x:vp.clientWidth/2,y:vp.clientHeight/2});
+function stat(){const p=P();$("stat").textContent=pl(p.tasks.length,"big task")+" · "+pl(p.tasks.reduce((a,t)=>a+t.subs.length,0),"subtask");$("empty").style.display=p.tasks.length?"none":"block"}
+function cardHtml(t){return `<div class="card${t.min?" min":""}" data-t="${t.id}" style="left:${t.x}px;top:${t.y}px;width:${t.w}px;${t.h?"height:"+t.h+"px;":""}--c:${t.color}">
+<div class="bar"><button class="tl r" data-a="del" title="Delete (press twice)">×</button><button class="tl y" data-a="min" title="Hide / show">–</button><button class="tl g" data-a="big" title="Enlarge / restore">+</button><span class="bt">${esc(t.title)||DEF}</span></div>
+<div class="cb"><div class="big"><input class="title" data-k="title" value="${esc(t.title)}" placeholder="Big task title"><small data-cat>${esc(cat(t.color))}</small>
+<div class="cols">${PAL.map(c=>`<button class="sw" data-a="col" data-c="${c}" style="background:${c}" aria-label="Color ${c}"></button>`).join("")}<label class="rb" title="Custom color"><input type="color" data-k="color" value="${t.color}" aria-label="Custom color"></label></div></div>
+${t.subs.map(s=>`<div class="sub${s.done?" done":""}" data-s="${s.id}"><div class="r1"><input type="checkbox" data-f="done" ${s.done?"checked":""} aria-label="Done"><input class="what" data-f="what" value="${esc(s.what)}" placeholder="Subtask">
+<div class="dur"><input type="number" min="0" inputmode="numeric" data-f="h" value="${esc(s.h)}" placeholder="0" aria-label="Hours">hr<input type="number" min="0" inputmode="numeric" data-f="m" value="${esc(s.m)}" placeholder="0" aria-label="Minutes">min</div><button class="x" data-a="delSub" aria-label="Delete subtask">✕</button></div>
+<div class="r2"><textarea data-f="how" placeholder="How (short)">${esc(s.how)}</textarea><textarea data-f="why" placeholder="Why">${esc(s.why)}</textarea></div></div>`).join("")}
+<button class="add" data-a="addSub">+ Add subtask</button><div class="foot" data-sum>${sum(t)}</div></div><div class="rz" title="Drag to resize"></div></div>`}
+function renderCards(){world.innerHTML=P().tasks.map(cardHtml).join("");stat()}
+function renderTabs(){
+  $("tabs").innerHTML=D.pages.map(p=>p.id===D.cur?`<input class="tab on" data-pn value="${esc(p.name)}" aria-label="Page name">`:`<button class="tab" data-pg="${p.id}">${esc(p.name)}</button>`).join("")+
+  `<button data-a="addPage">+ New page</button><button class="x" data-a="delPage"${D.pages.length<2?" disabled":""}>Delete page</button>`}
+function renderLegend(){
+  const cs=[...PAL];D.pages.forEach(p=>p.tasks.forEach(t=>{if(!cs.includes(t.color))cs.push(t.color)}));
+  $("lgList").innerHTML=cs.map(c=>`<div class="lg"><i style="background:${c}"></i><input data-lc="${c}" value="${esc(D.cats[c]||"")}" placeholder="What this color means..."></div>`).join("")}
+function render(){renderTabs();renderCards();apply()}
+const refreshCat=()=>world.querySelectorAll(".card").forEach(c=>c.querySelector("[data-cat]").textContent=cat(T(c.dataset.t).color));
+function setColor(c,t,col){t.color=col;c.style.setProperty("--c",col);c.querySelector("input[type=color]").value=col;refreshCat();save()}
+const armed=(b,msg,restore)=>{if(b.classList.contains("armed"))return true;b.classList.add("armed");const o=b.textContent;const bt=b.closest(".card")?.querySelector(".bt");if(bt)bt.textContent=msg;else b.textContent=msg;setTimeout(()=>{b.classList.remove("armed");if(bt)bt.textContent=restore;else b.textContent=o},2500);return false};
+world.addEventListener("input",e=>{
+  const c=e.target.closest(".card");if(!c)return;const t=T(c.dataset.t);
+  if(e.target.dataset.k==="title"){t.title=e.target.value;c.querySelector(".bt").textContent=t.title||DEF}
+  if(e.target.dataset.k==="color")setColor(c,t,e.target.value);
+  const sb=e.target.closest(".sub"),f=e.target.dataset.f;
+  if(sb&&f){const s=t.subs.find(x=>x.id===sb.dataset.s);if(f==="done"){s.done=e.target.checked;sb.classList.toggle("done",s.done)}else s[f]=e.target.value;c.querySelector("[data-sum]").textContent=sum(t)}
+  save();
+});
+world.addEventListener("click",e=>{
+  const b=e.target.closest("button[data-a]");if(!b)return;const a=b.dataset.a,c=b.closest(".card"),t=T(c.dataset.t);
+  if(a==="del"){if(!armed(b,"Press red again to delete",t.title||DEF))return;P().tasks=P().tasks.filter(x=>x!==t);save();return renderCards()}
+  if(a==="min"){t.min=!t.min;c.classList.toggle("min",t.min);return save()}
+  if(a==="big"){t.w=t.w>=700?440:720;t.h=null;c.style.width=t.w+"px";c.style.height="";return save()}
+  if(a==="col")return setColor(c,t,b.dataset.c);
+  if(a==="addSub")t.subs.push(newSub());
+  if(a==="delSub"){const id=b.closest(".sub").dataset.s;t.subs=t.subs.filter(s=>s.id!==id)}
+  save();renderCards();
+  if(a==="addSub"){const w=world.querySelectorAll('[data-t="'+t.id+'"] .what');w[w.length-1].focus()}
+});
+/* pan / pinch / card drag / card resize */
+const pts=new Map();let dg=null,rs=null;
+vp.addEventListener("pointerdown",e=>{
+  if(e.target.closest("button,.panel"))return;
+  const bar=e.target.closest(".bar"),rz=e.target.closest(".rz");
+  if(bar){const c=bar.closest(".card"),t=T(c.dataset.t);dg={c,t,sx:e.clientX,sy:e.clientY,ox:t.x,oy:t.y};c.classList.add("drag");bar.setPointerCapture(e.pointerId);return}
+  if(rz){const c=rz.closest(".card");rs={c,t:T(c.dataset.t),sx:e.clientX,sy:e.clientY,ow:c.offsetWidth,oh:c.offsetHeight};rz.setPointerCapture(e.pointerId);return}
+  if(e.target.closest(".card"))return;
+  if(document.activeElement)document.activeElement.blur();
+  vp.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+});
+vp.addEventListener("pointermove",e=>{
+  if(dg){const z=V().z;dg.t.x=dg.ox+(e.clientX-dg.sx)/z;dg.t.y=dg.oy+(e.clientY-dg.sy)/z;dg.c.style.left=dg.t.x+"px";dg.c.style.top=dg.t.y+"px";return}
+  if(rs){const z=V().z;rs.t.w=Math.round(Math.max(300,rs.ow+(e.clientX-rs.sx)/z));rs.t.h=Math.round(Math.max(140,rs.oh+(e.clientY-rs.sy)/z));rs.c.style.width=rs.t.w+"px";rs.c.style.height=rs.t.h+"px";return}
+  const p=pts.get(e.pointerId);if(!p)return;const o={x:p.x,y:p.y};p.x=e.clientX;p.y=e.clientY;
+  if(pts.size===1){const v=V();v.x+=p.x-o.x;v.y+=p.y-o.y;apply()}
+  else{const k=[...pts.entries()].find(([id])=>id!==e.pointerId)[1],d0=Math.hypot(o.x-k.x,o.y-k.y),d1=Math.hypot(p.x-k.x,p.y-k.y),r=vp.getBoundingClientRect();
+    if(d0)zoomAt((p.x+k.x)/2-r.left,(p.y+k.y)/2-r.top,d1/d0)}
+});
+const up=e=>{pts.delete(e.pointerId);if(rs){rs=null;save()}if(dg){const{c,t}=dg;c.classList.remove("drag");P().tasks=P().tasks.filter(x=>x!==t).concat(t);world.appendChild(c);dg=null;save()}};
+vp.addEventListener("pointerup",up);vp.addEventListener("pointercancel",up);
+vp.addEventListener("wheel",e=>{e.preventDefault();const r=vp.getBoundingClientRect();
+  if(e.ctrlKey||e.metaKey)zoomAt(e.clientX-r.left,e.clientY-r.top,Math.exp(-e.deltaY*.01));else{const v=V();v.x-=e.deltaX;v.y-=e.deltaY;apply()}},{passive:false});
+vp.addEventListener("scroll",()=>{vp.scrollTop=0;vp.scrollLeft=0});
+$("zi").onclick=()=>{const m=mid();zoomAt(m.x,m.y,1.2)};
+$("zo").onclick=()=>{const m=mid();zoomAt(m.x,m.y,1/1.2)};
+$("zv").onclick=()=>{const m=mid();zoomAt(m.x,m.y,1/V().z)};
+$("dotBtn").onclick=()=>{D.dots=!D.dots;apply()};
+function fit(){
+  const ts=P().tasks;if(!ts.length){Object.assign(V(),{x:30,y:30,z:vw0()});return apply()}
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  ts.forEach(t=>{const el=q(t);x0=Math.min(x0,t.x);y0=Math.min(y0,t.y);x1=Math.max(x1,t.x+el.offsetWidth);y1=Math.max(y1,t.y+el.offsetHeight)});
+  const w=x1-x0+60,h=y1-y0+60,z=Math.min(1,Math.max(.25,Math.min(vp.clientWidth/w,vp.clientHeight/h))),v=V();
+  v.z=z;v.x=(vp.clientWidth-(x1-x0)*z)/2-x0*z;v.y=(vp.clientHeight-(y1-y0)*z)/2-y0*z;apply();
+}
+$("fit").onclick=fit;
+$("addTask").onclick=()=>{
+  const v=V(),n=P().tasks.length%6*28;
+  const t=fixTask({x:(vp.clientWidth/2-v.x)/v.z-220+n,y:(vp.clientHeight/3-v.y)/v.z+n,subs:[newSub()]},0);
+  P().tasks.push(t);save();renderCards();q(t).querySelector(".title").focus();
+};
+/* pages */
+$("tabs").addEventListener("input",e=>{if(e.target.dataset.pn!==undefined){P().name=e.target.value;save()}});
+$("tabs").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.pg){D.cur=b.dataset.pg;render()}
+  if(b.dataset.a==="addPage"){const p=newPage("Page "+(D.pages.length+1));D.pages.push(p);D.cur=p.id;render()}
+  if(b.dataset.a==="delPage"&&armed(b,"Press again to delete")){const i=D.pages.findIndex(p=>p.id===D.cur);D.pages.splice(i,1);D.cur=D.pages[Math.max(0,i-1)].id;render()}
+});
+/* panels: colors + tidy, backup */
+const show=id=>["lgP","bkP"].forEach(x=>$(x).style.display=x===id&&$(x).style.display!=="block"?"block":"none");
+$("lgBtn").onclick=()=>{renderLegend();show("lgP")};
+$("lgList").addEventListener("input",e=>{const c=e.target.dataset.lc;if(!c)return;D.cats[c]=e.target.value;refreshCat();save()});
+$("tidy").onclick=()=>{
+  const groups=[];P().tasks.forEach(t=>{let g=groups.find(x=>x.c===t.color);if(!g)groups.push(g={c:t.color,l:[]});g.l.push(t)});
+  groups.forEach((g,i)=>{let y=0;g.l.forEach(t=>{t.x=i*500;t.y=y;y+=q(t).offsetHeight+24})});
+  renderCards();fit();$("lgP").style.display="none";
+};
+$("bkBtn").onclick=()=>{$("bkText").value=JSON.stringify(D);$("bkMsg").textContent="";show("bkP")};
+$("bkCopy").onclick=async()=>{const t=$("bkText");t.value=JSON.stringify(D);try{await navigator.clipboard.writeText(t.value);$("bkMsg").textContent="Copied"}catch(e){t.select();$("bkMsg").textContent="Selected, copy manually"}};
+$("bkImport").onclick=()=>{try{D=mig(JSON.parse($("bkText").value));save();render();$("bkMsg").textContent="Imported"}catch(e){$("bkMsg").textContent="Invalid data"}};
+render();
+</script>
+</body>
+</html>
